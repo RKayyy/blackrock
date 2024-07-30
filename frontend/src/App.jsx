@@ -30,7 +30,7 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/companystockspage" element={<CompanyStockPage />} />
+        <Route path="/companystockspage/:symbol" element={<CompanyStockPage />} />
       </Routes>
     </Router>
   );

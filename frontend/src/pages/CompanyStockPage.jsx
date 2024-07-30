@@ -15,7 +15,6 @@ const CompanyStockPage = () => {
   useEffect(() => {
     const fetchStockData = async () => {
       try {
-        // Use the symbol variable in the URL
         const response = await axios.get(`http://127.0.0.1:5000/stock/${symbol}`);
         setStockData(response.data);
         setLoading(false);
@@ -24,15 +23,12 @@ const CompanyStockPage = () => {
         setLoading(false);
       }
     };
-   
-      fetchStockData();
-    
+
+    fetchStockData();
   }, [symbol]);
-  
 
   const handleStockAction = async () => {
     try {
-      
       const endpoint = action === 'buy' ? '/buy' : '/sell';
       const response = await axios.post(`http://127.0.0.1:5000${endpoint}`, {
         user_id: userId,
@@ -52,22 +48,20 @@ const CompanyStockPage = () => {
 
   return (
     <div>
-      <div>
-        <h1>Company stocks graph and data</h1>
-        <h2>Company Symbol: {stockData.symbol}</h2>
-        <button onClick={() => setAction('buy')}>Buy</button>
-        <button onClick={() => setAction('sell')}>Sell</button>
-        <input
-          type="number"
-          value={units}
-          onChange={(e) => setUnits(e.target.value)}
-          placeholder="Number of units"
-          min="1"  // Ensure that only positive numbers can be entered
-        />
-        <button onClick={handleStockAction}>
-          {action === 'buy' ? 'Buy Stocks' : 'Sell Stocks'}
-        </button>
-      </div>
+      <h1>Company stocks graph and data</h1>
+      <h2>Company Symbol: {stockData.symbol}</h2>
+      <button onClick={() => setAction('buy')}>Buy</button>
+      <button onClick={() => setAction('sell')}>Sell</button>
+      <input
+        type="number"
+        value={units}
+        onChange={(e) => setUnits(e.target.value)}
+        placeholder="Number of units"
+        min="1"  // Ensure that only positive numbers can be entered
+      />
+      <button onClick={handleStockAction}>
+        {action === 'buy' ? 'Buy Stocks' : 'Sell Stocks'}
+      </button>
     </div>
   );
 };
