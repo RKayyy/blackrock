@@ -2,7 +2,7 @@ import React from 'react'
 import CompanyStocksTable from './CompanyStocksTable'
 import Dashboard from './Dashboard'
 import './Background.css';
-import Footer from './components/footer';
+import Footer from './components/Footer';
 
 const Home = () => {
   return (
