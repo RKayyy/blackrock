@@ -163,6 +163,12 @@ def get_top_ten():
         return jsonify(stock_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+    
+@app.route('/stockdetails', methods=['GET'])
+def stock_details():
+    return jsonify(stocks)
+
 
 @app.route('/buy', methods=['POST'])
 def buy_stock():
