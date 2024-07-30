@@ -4,6 +4,9 @@ const CompanyStocksTable = () => {
   return (
     <div>
       CompanyStocksTable
+      <button>
+        AAPL
+      </button>
     </div>
   )
 }

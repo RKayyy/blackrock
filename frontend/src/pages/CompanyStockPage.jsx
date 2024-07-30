@@ -13,7 +13,7 @@ const CompanyStockPage = () => {
   const userId = '66a91c9d62a6be8083bed17e'; // Replace with actual user ID
 
   useEffect(() => {
-    const fetchStockData = async (symbol) => {
+    const fetchStockData = async () => {
       try {
         // Use the symbol variable in the URL
         const response = await axios.get(`http://127.0.0.1:5000/stock/${symbol}`);
@@ -24,10 +24,9 @@ const CompanyStockPage = () => {
         setLoading(false);
       }
     };
-  
-    if (symbol) { 
-      fetchStockData(symbol);
-    }
+   
+      fetchStockData();
+    
   }, [symbol]);
   
 
