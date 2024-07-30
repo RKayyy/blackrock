@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const TodoModel = require('./models/Todo')
+const yahooFinance = require('yahoo-finance2').default;
+const axios = require('axios');
+
 
 const app = express()
 app.use(cors())
@@ -14,10 +17,21 @@ app.post('/add', (req, res) => {
     TodoModel.create({
         task: task
     }).then(result => res.json(result))
-    .catch(err => res.json(err))
+        .catch(err => res.json(err))
 
 })
 
-app.listen(5555, ()=>{
+app.get('/api/stock/:symbol', async (req, res) => {
+    const symbol = req.params.symbol;
+    const queryOptions = { period: '1d', interval: '1m' };
+    try {
+        const result = await yahooFinance.historical(symbol, queryOptions);
+        res.json(result);
+    } catch (error) {
+        res.status(500).send('Error fetching stock data');
+    }
+});
+
+app.listen(5555, () => {
     console.log('server is running');
 })
