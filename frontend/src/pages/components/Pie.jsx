@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios'; // or use fetch if preferred
 import Navbar from "./Navbar";
-import PieChart from "./PieChart";
+import PieChart from "./Piechart";
 // import PieChart from "./piechart";
 
 const PieChart1 = () => {
