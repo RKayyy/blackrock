@@ -85,11 +85,9 @@ def get_stock_data(symbol):
         return jsonify({'error': 'Invalid interval provided. Valid options are: ' + ', '.join(intervals_dict.keys())}), 400
 
     try:
-        # Determine the number of chunks based on the interval
         num_chunks = intervals_dict.get(interval, 30)  # Default to 30 if not found
         chunk_size = intervals_dict['1d']  # Base chunk size in days
 
-        # Fetch the stock data using yfinance
         stock = yf.Ticker(symbol)
         data = stock.history(period='max', interval='1d')  # Fetch daily data
 
@@ -124,6 +122,7 @@ def get_stock_data(symbol):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
     
 
 stocks = {

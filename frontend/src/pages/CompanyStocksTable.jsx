@@ -1,51 +1,67 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const CompanyStocksTable = () => {
-  const [symbol, setSymbol] = useState(''); // State for stock symbol
-  const [stockData, setStockData] = useState(null);
+  const [stockData, setStockData] = useState([]);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Initialize the navigate function
 
-  const handleFetchStockData = async () => {
-    if (!symbol) {
-      alert('Please enter a stock symbol');
-      return;
-    }
+  // Use useEffect to fetch data on component mount
+  useEffect(() => {
+    const fetchTopTenStocks = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/topten');
+        setStockData(response.data);
+        setError(null);
+      } catch (error) {
+        setStockData([]);
+        setError('Error fetching stock data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    try {
-      const response = await axios.get(`http://127.0.0.1:5000/stock/${symbol}`);
-      setStockData(response.data);
-      setError(null);
+    fetchTopTenStocks();
+  }, []);
 
-      // Navigate to /companystockspage with the symbol as a URL parameter
-      navigate(`/companystockspage/${symbol}`);
-    } catch (error) {
-      setStockData(null);
-      setError('Error fetching stock data');
-    }
+  // Handle row click
+  const handleRowClick = (symbol) => {
+    navigate(`/companystockspage/${symbol}`);
   };
 
   return (
-    <div>
-      <h2>CompanyStocksTable</h2>
-      <input
-        type="text"
-        value={symbol}
-        onChange={(e) => setSymbol(e.target.value)}
-        placeholder="Enter stock symbol"
-      />
-      <button onClick={handleFetchStockData}>
-        Fetch Stock Data
-      </button>
-      
+    <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      {loading && <div>Loading...</div>} {/* Show loading indicator */}
       {error && <div>{error}</div>}
-      {stockData && (
-        <div>
-          <h3>Stock Data for {stockData.symbol}</h3>
-          {/* Render stock data here as needed */}
-        </div>
+      {!loading && stockData.length > 0 && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Company</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Price</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Profit/Loss</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {stockData.map((stock, index) => (
+                <TableRow
+                  key={index}
+                  hover
+                  onClick={() => handleRowClick(stock.company)} // Add onClick handler
+                  style={{ cursor: 'pointer' }} // Change cursor style to indicate clickable
+                >
+                  <TableCell align="center">{stock.company}</TableCell>
+                  <TableCell align="center">{stock.price.toFixed(2)}</TableCell>
+                  <TableCell align="center">{stock['p/l']}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </div>
   );
