@@ -36,12 +36,13 @@ const Dashboard = () => {
               grid={{ vertical: true, horizontal: true }}
             />
           </div>
-          
+        </div>
+        <div className="flex w-full justify-start mt-10">
+          <div className="w-1/3 flex justify-center">
+            <Donut />
+          </div>
         </div>
       </div>
-          <div className="left-column">
-            <Donut/>
-          </div>
     </>
   );
 };
