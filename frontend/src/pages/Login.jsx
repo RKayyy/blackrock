@@ -12,16 +12,33 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/add', {
+      // Check if user already exists
+      const checkResponse = await axios.post('http://127.0.0.1:5000/check_user', {
         name,
         email,
         role
       });
 
-      alert(response.data.message);
-      navigate('/home');  // Navigate to /dashboard upon successful login
+      if (checkResponse.data.exists) {
+        // User exists, proceed to login
+        alert(checkResponse.data.message);
+        localStorage.setItem('user_id', checkResponse.data.user_id); // Store user ID
+        navigate('/home');  // Navigate to /home upon successful login
+      } else {
+        // User does not exist, add user
+        const addResponse = await axios.post('http://127.0.0.1:5000/add', {
+          name,
+          email,
+          role
+        });
+
+        alert(addResponse.data.message);
+        localStorage.setItem('user_id', addResponse.data.user_id); // Store new user ID
+        navigate('/home');  // Navigate to /home upon successful login
+      }
     } catch (error) {
       console.error('There was an error!', error);
+      alert('An error occurred during login');
     }
   };
 
