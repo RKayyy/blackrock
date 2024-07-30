@@ -1,8 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import PieChart from "./components/PyChart";
 import Navbar from "./components/Navbar";
 import { LineChart } from '@mui/x-charts/LineChart';
 import axios from 'axios';
+import Donut from "./components/Dopie";
+
 
 const Dashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
@@ -69,6 +72,11 @@ const Dashboard = () => {
             margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
             grid={{ vertical: true, horizontal: true }}
           />
+        </div>
+<div className="w-1/3 flex justify-center">
+            <Donut />
+          </div>
+
         </div>
       </div>
     </>

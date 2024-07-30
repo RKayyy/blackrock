@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import yfinance as yf
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -42,6 +43,7 @@ def add_user():
     return jsonify({"message": "User added successfully", "user_id": str(result.inserted_id)})
 
 
+
 @app.route('/stocks/<user_id>', methods=['GET'])
 def get_user_stocks(user_id):
     stocks = mongo.db.stocks.find({'user_id': user_id})
@@ -69,9 +71,10 @@ def check_user():
     else:
         return jsonify({"exists": False})
 
+
 @app.route('/users', methods=['GET'])
 def get_users():
-    users = list(mongo.db.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
+    users = list(mongo.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
     return jsonify(users)
 
 @app.route('/stock/<symbol>', methods=['GET'])
@@ -119,6 +122,46 @@ def get_stock_data(symbol):
             'interval': interval,
             'data_chunks': data_points
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+stocks = {
+    'AAPL': {'ESG_value': 75, 'type': 'Technology'},
+    'RIL': {'ESG_value': 65, 'type': 'Energy'},
+    'INFY': {'ESG_value': 80, 'type': 'Technology'},
+    'HDB': {'ESG_value': 70, 'type': 'Financial'},
+    'IBN': {'ESG_value': 68, 'type': 'Financial'},
+    'ACN': {'ESG_value': 78, 'type': 'Technology'},
+    'DNN': {'ESG_value': 60, 'type': 'Energy'},
+    'FSV': {'ESG_value': 72, 'type': 'Real Estate'},
+    'IFF': {'ESG_value': 74, 'type': 'Consumer Goods'},
+    'LPG': {'ESG_value': 66, 'type': 'Energy'}
+}
+
+@app.route("/topten")
+def get_top_ten():
+    try:
+        stock_data = []
+        for symbol, info in stocks.items():
+            stock = yf.Ticker(symbol)
+            hist = stock.history(period='1d')  # Fetch today's data
+
+            if hist.empty:
+                continue
+
+            current_price = hist['Close'].iloc[-1]
+            open_price = hist['Open'].iloc[-1]
+            profitable = current_price > open_price
+
+            stock_info = {
+                'company': symbol,
+                'price': current_price,
+                'p/l': 'profitable' if profitable else 'not profitable'
+            }
+            stock_data.append(stock_info)
+
+        return jsonify(stock_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -172,6 +215,7 @@ def sell_stock():
 
     return jsonify({'message': 'Stock sold successfully'}), 200
 
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
