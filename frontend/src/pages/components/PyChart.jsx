@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PieChart as RechartsPieChart, Pie, Tooltip, Cell } from 'recharts';
+import { PieChart as RechartsPieChart, Pie, Tooltip, Cell, LabelList } from 'recharts';
 
 const PieChart = ({ data, outerRadius, colors }) => {
     const [activeIndex, setActiveIndex] = useState(-1);
@@ -22,6 +22,12 @@ const PieChart = ({ data, outerRadius, colors }) => {
                 {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
+                <LabelList
+                    dataKey="name"
+                    position="outside"
+                    fill="#000"
+                    fontSize={12}
+                />
             </Pie>
             <Tooltip />
         </RechartsPieChart>
