@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import yfinance as yf
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -41,24 +42,9 @@ def add_user():
     result = mongo.db.users.insert_one(user)  # Replace with your collection name
     return jsonify({"message": "User added successfully", "user_id": str(result.inserted_id)})
 
-
-@app.route('/check_user', methods=['POST'])
-def check_user():
-    data = request.json
-    name = data.get('name')
-    email = data.get('email')
-    role = data.get('role')
-    
-    existing_user = mongo.db.users.find_one({"name": name, "email": email, "role": role})
-    
-    if existing_user:
-        return jsonify({"exists": True, "message": "User already exists, logged in successfully!"})
-    else:
-        return jsonify({"exists": False})
-
 @app.route('/users', methods=['GET'])
 def get_users():
-    users = list(mongo.db.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
+    users = list(mongo.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
     return jsonify(users)
 
 @app.route('/stock/<symbol>', methods=['GET'])
@@ -108,57 +94,47 @@ def get_stock_data(symbol):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-@app.route('/buy', methods=['POST'])
-def buy_stock():
-    data = request.json
-    print(f"Received data for buy: {data}")  # Add this line to log the data
-    user_id = data.get('user_id')
-    symbol = data.get('symbol')
-    units = int(data.get('units', 0))
     
-    # if not user_id or not symbol or units <= 0:
-    #     return jsonify({'error': 'Invalid input'}), 400
 
-    stock_entry = mongo.db.stocks.find_one({'user_id': user_id, 'symbol': symbol})
+stocks = {
+    'AAPL': {'ESG_value': 75, 'type': 'Technology'},
+    'RIL': {'ESG_value': 65, 'type': 'Energy'},
+    'INFY': {'ESG_value': 80, 'type': 'Technology'},
+    'HDB': {'ESG_value': 70, 'type': 'Financial'},
+    'IBN': {'ESG_value': 68, 'type': 'Financial'},
+    'ACN': {'ESG_value': 78, 'type': 'Technology'},
+    'DNN': {'ESG_value': 60, 'type': 'Energy'},
+    'FSV': {'ESG_value': 72, 'type': 'Real Estate'},
+    'IFF': {'ESG_value': 74, 'type': 'Consumer Goods'},
+    'LPG': {'ESG_value': 66, 'type': 'Energy'}
+}
+
+@app.route("/topten")
+def get_top_ten():
+    try:
+        stock_data = []
+        for symbol, info in stocks.items():
+            stock = yf.Ticker(symbol)
+            hist = stock.history(period='1d')  # Fetch today's data
+
+            if hist.empty:
+                continue
+
+            current_price = hist['Close'].iloc[-1]
+            open_price = hist['Open'].iloc[-1]
+            profitable = current_price > open_price
+
+            stock_info = {
+                'company': symbol,
+                'price': current_price,
+                'p/l': 'profitable' if profitable else 'not profitable'
+            }
+            stock_data.append(stock_info)
+
+        return jsonify(stock_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
-    if stock_entry:
-        mongo.db.stocks.update_one(
-            {'user_id': user_id, 'symbol': symbol},
-            {'$inc': {'units': units}}
-        )
-    else:
-        mongo.db.stocks.insert_one({
-            'user_id': user_id,
-            'symbol': symbol,
-            'units': units
-        })
-    
-    return jsonify({'message': 'Stock bought successfully'}), 200
-
-@app.route('/sell', methods=['POST'])
-def sell_stock():
-    data = request.json
-    print(f"Received data for sell: {data}")  # Add this line to log the data
-    user_id = data.get('user_id')
-    symbol = data.get('symbol')
-    units = int(data.get('units', 0))
-    
-    if not user_id:
-        return jsonify({'error': 'Invalid input'}), 400
-
-    stock_entry = mongo.db.stocks.find_one({'user_id': user_id, 'symbol': symbol})
-
-    if not stock_entry or stock_entry['units'] < units:
-        return jsonify({'error': 'Not enough stocks to sell'}), 400
-
-    mongo.db.stocks.update_one(
-        {'user_id': user_id, 'symbol': symbol},
-        {'$inc': {'units': -units}}
-    )
-
-    return jsonify({'message': 'Stock sold successfully'}), 200
-
 
 if __name__ == '__main__':
     app.run(debug=True)
