@@ -42,6 +42,19 @@ def add_user():
     return jsonify({"message": "User added successfully", "user_id": str(result.inserted_id)})
 
 
+@app.route('/stocks/<user_id>', methods=['GET'])
+def get_user_stocks(user_id):
+    stocks = mongo.db.stocks.find({'user_id': user_id})
+    stocks_list = []
+    for stock in stocks:
+        stocks_list.append({
+            'symbol': stock['symbol'],
+            'units': stock['units']
+        })
+    return jsonify(stocks_list)
+
+
+
 @app.route('/check_user', methods=['POST'])
 def check_user():
     data = request.json
