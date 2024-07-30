@@ -5,9 +5,23 @@ import { useState } from 'react';
 const Create = () => {
   const [task, setTask] = useState();
   const handleAdd = () => {
-    axios.post('http://localhost:5555/add', {task: task})
-    .then(result=>console.log(result)).catch(err => console.log(err))
-  }
+    if (!task.trim()) {
+      alert("Task cannot be empty!");
+      return;
+    }
+  
+    axios.post('http://localhost:5555/add', { task: task })
+      .then(result => {
+        console.log(result);
+        alert("Task added successfully!");
+        setTask(''); // Clear the input field
+      })
+      .catch(err => {
+        console.log(err);
+        alert("Error adding task. Please try again.");
+      });
+  };
+  
   return (
     <div>
       <input type="text" name="" id="" placeholder="Enter Task" onChange={(e)=> setTask(e.target.value)} />
