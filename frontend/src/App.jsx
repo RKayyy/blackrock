@@ -21,6 +21,7 @@ import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import CompanyStockPage from "./pages/CompanyStockPage";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/companystockspage" element={<CompanyStockPage />} />
       </Routes>
     </Router>
   );
