@@ -17,15 +17,18 @@
 
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./Home";
+import Home from "./pages/Home";
 import Signup from "./pages/Signup";
+import LoginPage from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route path="/home" element={<Home />} />
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
