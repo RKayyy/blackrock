@@ -1,8 +1,8 @@
 import React from "react";
-import PieChart from "./components/PyChart";
+import PyChart from "./components/PyChart";
 import Navbar from "./components/Navbar";
 import { LineChart } from '@mui/x-charts/LineChart';
-
+import Donut from "./components/Dopie";
 
 const Dashboard = () => {
   const data = [
@@ -17,25 +17,31 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col">
-        <div>
-          <h1>Student Data</h1>
-          <PieChart data={data} outerRadius={250} colors={COLORS} />
-        </div>
-        <div>
-        <LineChart
-      xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-      series={[
-        {
-          data: [2, 5.5, 2, 8.5, 1.5, 5],
-        },
-      ]}
-      height={300}
-      margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-      grid={{ vertical: true, horizontal: true }}
-    />
+      <div className="flex flex-col items-center">
+        <h1>Student Data</h1>
+        <div className="flex flex-row w-full justify-between">
+          <div className="w-1/2 flex justify-center">
+            <PyChart data={data} outerRadius={250} colors={COLORS} />
+          </div>
+          <div className="w-1/2 flex justify-center mt-20 mr-10 ml-10">
+            <LineChart
+              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+              series={[
+                {
+                  data: [2, 5.5, 2, 8.5, 1.5, 5],
+                },
+              ]}
+              height={500}
+              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
+              grid={{ vertical: true, horizontal: true }}
+            />
+          </div>
+          
         </div>
       </div>
+          <div className="left-column">
+            <Donut/>
+          </div>
     </>
   );
 };
