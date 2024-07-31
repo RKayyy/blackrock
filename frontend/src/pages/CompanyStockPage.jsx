@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import ChatbotComponent from './components/ChatComponent'; // Import the chatbot component
 
 const CompanyStockPage = () => {
   const { symbol } = useParams(); // Extract symbol from URL
@@ -98,6 +99,9 @@ const CompanyStockPage = () => {
       <button onClick={handleStockAction}>
         {action === 'buy' ? 'Buy Stocks' : 'Sell Stocks'}
       </button>
+
+      {/* Add Chatbot Component */}
+      <ChatbotComponent/>
     </div>
   );
 };
