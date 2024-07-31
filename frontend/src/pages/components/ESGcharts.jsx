@@ -13,12 +13,12 @@ import {
 // ESG Bar Chart Component
 const ESGBarChart = ({ data }) => {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="80%" height={200}>
       <BarChart
         data={data}
         margin={{
           top: 20,
-          right: 30,
+          right: 20,
           left: 20,
           bottom: 5,
         }}

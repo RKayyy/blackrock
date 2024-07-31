@@ -5,11 +5,11 @@ const Footer = () => {
     <div>
 
     
-    <footer className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white py-8">
+    <footer className="bg-gray-950 text-white py-4 rounded">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
-            <h2 className="text-3xl font-bold">Company Name</h2>
+            <h2 className="text-3xl font-bold">FINGG</h2>
             <p className="mt-2">Creating value for the future.</p>
           </div>
           <div className="flex space-x-4">

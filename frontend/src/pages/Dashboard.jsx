@@ -8,6 +8,8 @@ import SectorDonutChart from "./components/Donut"; // Import the Sector Donut Ch
 import '../styles/Dashboard.css'; // Import the CSS file
 import PropTypes from 'prop-types';
 import Buckets from "./components/Buckets";
+import Typing from 'react-typing-effect';
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
@@ -18,6 +20,25 @@ const Dashboard = () => {
   const [error, setError] = useState(null); // State for error handling
   const userId = "66a91c9d62a6be8083bed17e"; // Replace with actual user ID
 
+  const handleTypingComplete = () => {
+    setCurrentMottoIndex((prevIndex) => (prevIndex + 1) % mottoVariations.length);
+  };
+
+  const mottoVariations = [
+    "We prioritize our clients' financial success.",
+    "Our passion drives performance and financial growth.",
+    "We take pride in emotional ownership of your financial future.",
+    "Integrity and finance expertise guide our client relations.",
+    "Empowering clients through personalized financial solutions.",
+    "We deliver performance with passion and precision.",
+    "Your financial goals are our mission."
+  ];
+
+  const [currentMottoIndex, setCurrentMottoIndex] = useState(
+    Math.floor(Math.random() * mottoVariations.length)
+  );
+
+  // Update the motto index periodically
   useEffect(() => {
     const fetchStockData = async () => {
       try {
@@ -92,54 +113,78 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="p-4">
-        {error && <div className="error-message">{error}</div>}
-        <div className="dashboard-grid">
-          <div className="dashboard-item">
-            <h1 className="text-2xl font-bold mb-2">Stock Data</h1>
-            <PieChart data={pieChartData} outerRadius={250} colors={COLORS} />
+      <div className="p-4 flex flex-col items-center bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white min-h-screen ">
+        {error && <div className="error-message text-red-500 mb-4">{error}</div>}
+        <div className="mt-10"></div>
+        <div className="flex flex-col lg:flex-row w-full mb-8 mt-20">
+          {/* Left Section with Motto */}
+          <div className="lg:w-2/4 bg-gray-0 p-5 rounded-lg shadow-lg mb-6 lg:mb-0 ">
+            <h1 className="text-5xl font-bold mb-4 text-center text-gray-0 mt-20">
+              <Typing
+                text={mottoVariations[currentMottoIndex]}
+                cursor=" "
+                speed={100} // Typing speed
+                eraseSpeed={50} // Erase speed
+                eraseDelay={1000} // Delay before erasing
+                typingDelay={500} // Delay before typing starts
+                className="text-6xl font-extrabold text-gray-300" // Larger font for typing effect with light gray color
+                onFinishedTyping={handleTypingComplete} // Callback when typing completes
+              />
+            </h1>
           </div>
 
-          <div className="dashboard-item">
-            <h2 className="text-xl font-semibold mb-2">ESG Values</h2>
-            <ESGBarChart data={esgData} />
-          </div>
 
-          <div className="dashboard-item">
-            <h2 className="text-xl font-semibold mb-2">Sector Distribution</h2>
-            <SectorDonutChart data={sectorData} />
-          </div>
-
-          <div className="dashboard-item">
-            <h2 className="text-xl font-semibold mb-2">Line Chart</h2>
-            <LineChart
-              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-              series={[
-                {
-                  data: [2, 5.5, 2, 8.5, 1.5, 5],
-                },
-              ]}
-              height={300}
-              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-              grid={{ vertical: true, horizontal: true }}
-            />
-          </div>
-
-          {userRole === "admin" && (
-            <div className="dashboard-item">
-              <h2 className="text-xl font-semibold mb-2">Buckets</h2>
-              <Buckets /> {/* Conditionally render the Buckets component */}
+          {/* Right Section with Charts arranged in 2x2 grid */}
+          <div className="lg:w-3/4 lg:ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* First Row: Pie Chart and Line Chart */}
+            <div className="bg-gray-700 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
+              <h2 className="text-lg font-bold z-1 text-center">Stock Data</h2>
+              <PieChart
+                data={pieChartData}
+                outerRadius={70} // Smaller size for the pie chart
+                colors={['#ff6361', '#bc5090', '#ffa600']}
+              // className="mt-1"
+              />
             </div>
-          )}
+
+            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
+              {/* <h2 className="text-lg font-bold mb-2 text-center">Line Chart</h2> */}
+              <LineChart
+                xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+                series={[
+                  {
+                    data: [2, 5.5, 2, 8.5, 1.5, 5],
+                  },
+                ]}
+                height={300} // Reduced height
+                margin={{ left: 10, right: 10, top: 10, bottom: 10 }} // Reduced margins
+                grid={{ vertical: true, horizontal: true }}
+              />
+            </div>
+
+            {/* Second Row: ESG Bar Chart and Sector Donut Chart */}
+            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
+              <h2 className="text-lg font-bold mb-2 text-center">ESG Values</h2>
+              <ESGBarChart data={esgData} height={50} width={100} /> {/* Reduced height and set width */}
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
+              {/* <h2 className="text-lg font-bold text-center mt-10 ">Sector Distribution</h2> */}
+              <div className="mt-10"></div>
+              <SectorDonutChart data={sectorData} /> {/* Smaller size */}
+            </div>
+          </div>
         </div>
+        {/* Buckets Section */}
+        {userRole === "admin" && (
+          <div className="mt-6 w-full bg-gray-700 p-6 rounded-lg shadow-lg">
+            <h2 className="text-3xl font-bold mb-4 text-center text-white">BUCKETS</h2>
+            <Buckets />
+          </div>
+        )}
       </div>
     </>
   );
-};
-
-Dashboard.propTypes = {
-  userId: PropTypes.string.isRequired,
-  userRole: PropTypes.string,
 };
 
 export default Dashboard;

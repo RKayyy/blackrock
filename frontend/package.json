@@ -16,6 +16,8 @@
     "@clerk/clerk-react": "^5.2.10",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.1.2",
     "@mui/material": "^5.16.5",
     "@mui/x-charts": "^7.11.1",
@@ -28,6 +30,7 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
     "react-router-dom": "^6.25.1",
+    "react-typing-effect": "^2.0.5",
     "recharts": "^2.12.7",
     "styled-components": "^6.1.12"
   },
