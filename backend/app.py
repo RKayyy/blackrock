@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo
 import yfinance as yf
 from datetime import datetime, timedelta
 import google.generativeai as gen_ai
+from bson import ObjectId
 import json 
 
 app = Flask(__name__)
@@ -52,6 +53,23 @@ def add_user():
     result = mongo.db.users.insert_one(user)  # Replace with your collection name
     return jsonify({"message": "User added successfully", "user_id": str(result.inserted_id)})
 
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user_details(user_id):
+    try:
+        # Convert user_id to ObjectId
+        user_id = ObjectId(user_id)
+        
+        # Fetch user details from the database
+        user = mongo.db.users.find_one({'_id': user_id})
+        
+        if user:
+            # Remove the MongoDB ObjectId field from the user data
+            user['_id'] = str(user['_id'])
+            return jsonify(user), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/stocks/<user_id>', methods=['GET'])
