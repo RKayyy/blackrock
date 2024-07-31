@@ -5,15 +5,27 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import axios from 'axios';
 import ESGBarChart from "./components/ESGcharts"; // Import the ESG Bar Chart component
 import SectorDonutChart from "./components/Donut"; // Import the Sector Donut Chart component
+import Buckets from "./components/Buckets"; // Import the Buckets component
 import '../styles/Dashboard.css'; // Import the CSS file
 
 const Dashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
   const [esgData, setEsgData] = useState([]);
   const [sectorData, setSectorData] = useState([]);
+  const [userRole, setUserRole] = useState('');
   const userId = "66a91c9d62a6be8083bed17e"; // Replace with actual user ID
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:5000/user/${userId}`);
+        console.log(response.data);
+        setUserRole(response.data.role);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
     const fetchStockData = async () => {
       try {
         // Fetch stocks for the user
@@ -73,6 +85,7 @@ const Dashboard = () => {
       }
     };
 
+    fetchUserData();
     fetchStockData();
   }, [userId]);
 
@@ -112,6 +125,13 @@ const Dashboard = () => {
               grid={{ vertical: true, horizontal: true }}
             />
           </div>
+
+          {userRole === "admin" && (
+            <div className="dashboard-item">
+              <h2 className="text-xl font-semibold mb-2">Buckets</h2>
+              <Buckets /> {/* Conditionally render the Buckets component */}
+            </div>
+          )}
         </div>
       </div>
     </>

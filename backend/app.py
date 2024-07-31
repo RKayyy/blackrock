@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
+from bson import ObjectId
 import yfinance as yf
 from datetime import datetime, timedelta
 
@@ -42,7 +43,13 @@ def add_user():
     result = mongo.db.users.insert_one(user)  # Replace with your collection name
     return jsonify({"message": "User added successfully", "user_id": str(result.inserted_id)})
 
-
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)}, {"_id": 0, "name": 1, "email": 1, "role": 1})
+    if user:
+        return jsonify(user)
+    else:
+        return jsonify({"error": "User not found"}), 404
 
 @app.route('/stocks/<user_id>', methods=['GET'])
 def get_user_stocks(user_id):
@@ -54,8 +61,6 @@ def get_user_stocks(user_id):
             'units': stock['units']
         })
     return jsonify(stocks_list)
-
-
 
 @app.route('/check_user', methods=['POST'])
 def check_user():
@@ -71,10 +76,9 @@ def check_user():
     else:
         return jsonify({"exists": False})
 
-
 @app.route('/users', methods=['GET'])
 def get_users():
-    users = list(mongo.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
+    users = list(mongo.db.users.find({}, {"_id": 0, "name": 1, "email": 1, "role": 1}))
     return jsonify(users)
 
 @app.route('/stock/<symbol>', methods=['GET'])
@@ -123,8 +127,6 @@ def get_stock_data(symbol):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-    
-
 stocks = {
     'AAPL': {'ESG_value': 75, 'type': 'Technology'},
     'RIL': {'ESG_value': 65, 'type': 'Energy'},
@@ -163,12 +165,10 @@ def get_top_ten():
         return jsonify(stock_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-    
+
 @app.route('/stockdetails', methods=['GET'])
 def stock_details():
     return jsonify(stocks)
-
 
 @app.route('/buy', methods=['POST'])
 def buy_stock():
@@ -219,8 +219,6 @@ def sell_stock():
     )
 
     return jsonify({'message': 'Stock sold successfully'}), 200
-
-    
 
 if __name__ == '__main__':
     app.run(debug=True)
