@@ -159,6 +159,7 @@ def get_stock_data(symbol):
     
 
 stocks = {
+    'BLK' : {"ESG_value":100, "type":"Financial"},
     'AAPL': {'ESG_value': 75, 'type': 'Technology'},
     'RIL': {'ESG_value': 65, 'type': 'Energy'},
     'INFY': {'ESG_value': 80, 'type': 'Technology'},
@@ -293,6 +294,21 @@ def handle_query(symbol):
 
     response = get_response(symbol, current_price, historical_data, user_query)
     return jsonify({'response': response})
+
+@app.route('/expenses/<user_id>', methods=['GET'])
+def get_expenses(user_id):
+    try:
+        # Fetch expenses for the given user_id from the database
+        expenses = mongo.db.balances.find({'uid': user_id})
+        expenses_list = []
+        for expense in expenses:
+            expenses_list.append({
+                'balance': expense['balance']
+            })
+        return jsonify(expenses_list)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/chat', methods=['POST'])

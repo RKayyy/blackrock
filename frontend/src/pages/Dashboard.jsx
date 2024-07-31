@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import PieChart from "./components/PyChart";
 import Navbar from "./components/Navbar";
-import { LineChart } from '@mui/x-charts/LineChart';
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'; // Using Recharts instead
 import axios from 'axios';
-import ESGBarChart from "./components/ESGcharts"; // Import the ESG Bar Chart component
-import SectorDonutChart from "./components/Donut"; // Import the Sector Donut Chart component
-import '../styles/Dashboard.css'; // Import the CSS file
+import ESGBarChart from "./components/ESGcharts";
+import SectorDonutChart from "./components/Donut";
+import '../styles/Dashboard.css';
 import PropTypes from 'prop-types';
 import Buckets from "./components/Buckets";
 
@@ -14,20 +14,23 @@ const Dashboard = () => {
   const [esgData, setEsgData] = useState([]);
   const [sectorData, setSectorData] = useState([]);
   const [userRole, setUserRole] = useState('');
-  const [userDetails, setUserDetails] = useState(null);
-  const [error, setError] = useState(null); // State for error handling
-  const userId = "66a91c9d62a6be8083bed17e"; // Replace with actual user ID
+  const [expenseData, setExpenseData] = useState([]);
+  const [error, setError] = useState(null);
+  const userId = "66a91c9d62a6be8083bed17e";
+  const [money, setMoney] = useState(0);
 
   useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchData = async () => {
       try {
-        const [userStocksResponse, stockDetailsResponse] = await Promise.all([
+        const [userStocksResponse, stockDetailsResponse, expenseResponse] = await Promise.all([
           axios.get(`http://127.0.0.1:5000/stocks/${userId}`),
-          axios.get('http://127.0.0.1:5000/stockdetails')
+          axios.get('http://127.0.0.1:5000/stockdetails'),
+          axios.get(`http://127.0.0.1:5000/expenses/${userId}`)
         ]);
 
         const userStocks = userStocksResponse.data;
         const stockDetails = stockDetailsResponse.data;
+        const expenses = expenseResponse.data;
 
         const stockPromises = userStocks.map(stock =>
           axios.get(`http://127.0.0.1:5000/stock/${stock.symbol}`)
@@ -67,9 +70,10 @@ const Dashboard = () => {
         setPieChartData(formattedData);
         setEsgData(esgData);
         setSectorData(sectorData);
+        setExpenseData(expenses);
       } catch (error) {
-        console.error('Error fetching stock data:', error);
-        setError('Failed to fetch stock data. Please try again later.');
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch data. Please try again later.');
       }
     };
 
@@ -83,15 +87,27 @@ const Dashboard = () => {
       }
     };
 
-    fetchStockData();
+    fetchData();
     fetchUserDetails();
   }, [userId]);
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
+  // Convert expenses data to use day number
+  const formatExpenseData = (data) => {
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return sortedData.map((item, index) => ({
+      day: index + 1, // Day number
+      balance: item.balance // Use the correct field for the value
+    }));
+  };
+
+  const formattedExpenseData = formatExpenseData(expenseData);
+
   return (
     <>
-      <Navbar />
+      <Navbar accountBalance={money} />
       <div className="p-4">
         {error && <div className="error-message">{error}</div>}
         <div className="dashboard-grid">
@@ -111,24 +127,26 @@ const Dashboard = () => {
           </div>
 
           <div className="dashboard-item">
-            <h2 className="text-xl font-semibold mb-2">Line Chart</h2>
+            <h2 className="text-xl font-semibold mb-2">Expense Line Chart</h2>
             <LineChart
-              xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-              series={[
-                {
-                  data: [2, 5.5, 2, 8.5, 1.5, 5],
-                },
-              ]}
+              width={500}
               height={300}
-              margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-              grid={{ vertical: true, horizontal: true }}
-            />
+              data={formattedExpenseData}
+              margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="balance" stroke="#8884d8" />
+            </LineChart>
           </div>
 
           {userRole === "admin" && (
             <div className="dashboard-item">
               <h2 className="text-xl font-semibold mb-2">Buckets</h2>
-              <Buckets /> {/* Conditionally render the Buckets component */}
+              <Buckets />
             </div>
           )}
         </div>

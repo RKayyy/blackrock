@@ -1,11 +1,76 @@
-import React, { useState } from 'react';
-import { Transition } from '@headlessui/react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Navbar = () => {
+  const [totalAmount, setTotalAmount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [depositAmount, setDepositAmount] = useState('');
+  const modalRef = useRef(null);
+
+  const handleWithdraw = (amount) => {
+    setTotalAmount(prevAmount => prevAmount - amount);
+  };
+
+  const handleDeposit = (amount) => {
+    setTotalAmount(prevAmount => prevAmount + amount);
+  };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleOpenWithdrawModal = () => {
+    setIsWithdrawModalOpen(true);
+  };
+
+  const handleOpenDepositModal = () => {
+    setIsDepositModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsWithdrawModalOpen(false);
+    setIsDepositModalOpen(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      handleCloseModal();
+    }
+  };
+
+  useEffect(() => {
+    if (isWithdrawModalOpen || isDepositModalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isWithdrawModalOpen, isDepositModalOpen]);
+
+  const handleWithdrawClick = () => {
+    const amount = parseFloat(withdrawAmount);
+    if (amount && !isNaN(amount) && amount > 0) {
+      handleWithdraw(amount);
+      setWithdrawAmount('');
+      handleCloseModal();
+    } else {
+      alert("Please enter a valid amount.");
+    }
+  };
+
+  const handleDepositClick = () => {
+    const amount = parseFloat(depositAmount);
+    if (amount && !isNaN(amount) && amount > 0) {
+      handleDeposit(amount);
+      setDepositAmount('');
+      handleCloseModal();
+    } else {
+      alert("Please enter a valid amount.");
+    }
   };
 
   return (
@@ -17,42 +82,83 @@ const Navbar = () => {
           </svg>
           <span>Logo</span>
         </div>
-        <div className="hidden md:flex space-x-8">
-          <a href="#home" className="text-gray-800 hover:text-gray-800 transition duration-300 hover:shadow-lg p-3 rounded-lg border border-black">Home</a>
-          <a href="#about" className="text-gray-800 hover:text-gray-800 transition duration-300 hover:shadow-lg p-3 rounded-lg border border-black">About</a>
-          <a href="#services" className="text-gray-800 hover:text-gray-800 transition duration-300 hover:shadow-lg p-3 rounded-lg border border-black">Services</a>
-          <a href="#contact" className="text-gray-800 hover:text-gray-800 transition duration-300 hover:shadow-lg p-3 rounded-lg border border-black">Contact</a>
-        </div>
-        <div className="md:hidden flex items-center">
-          <button onClick={toggleMenu} className="text-gray-800 focus:outline-none">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-              )}
-            </svg>
-          </button>
+        <div className="hidden md:flex items-center">
+          <div className="account-balance-box p-4 border rounded mx-4 flex items-center">
+            <p className="text-lg font-medium mr-2">Total Amount: ${totalAmount.toFixed(2)}</p>
+            <button 
+              className="w-60 h-10 bg-gradient-to-r m-2 from-blue-400 to-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:from-blue-500 hover:to-blue-700 transition-transform transform hover:scale-105"
+              onClick={handleOpenWithdrawModal}
+            >
+              Withdraw
+            </button>
+            <button 
+              className="w-60 h-10 bg-gradient-to-r m-2 from-green-400 to-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:from-green-500 hover:to-green-700 transition-transform transform hover:scale-105"
+              onClick={handleOpenDepositModal}
+            >
+              Deposit
+            </button>
+          </div>
         </div>
       </div>
-      <Transition
-        show={isOpen}
-        enter="transition-transform transform duration-300"
-        enterFrom="scale-95 opacity-0"
-        enterTo="scale-100 opacity-100"
-        leave="transition-transform transform duration-300"
-        leaveFrom="scale-100 opacity-100"
-        leaveTo="scale-95 opacity-0"
-      >
-        <div className={`md:hidden absolute top-full left-0 w-full bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 py-4`}>
-          <a href="#home" className="block text-gray-800 text-center py-2 hover:bg-gray-100 transition duration-300 hover:shadow-lg border-b border-black">Home</a>
-          <a href="#about" className="block text-gray-800 text-center py-2 hover:bg-gray-100 transition duration-300 hover:shadow-lg border-b border-black">About</a>
-          <a href="#services" className="block text-gray-800 text-center py-2 hover:bg-gray-100 transition duration-300 hover:shadow-lg border-b border-black">Services</a>
-          <a href="#contact" className="block text-gray-800 text-center py-2 hover:bg-gray-100 transition duration-300 hover:shadow-lg border-b border-black">Contact</a>
+      {isWithdrawModalOpen && (
+        <div ref={modalRef} className="modal fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-xl font-semibold mb-4">Withdraw Funds</h2>
+            <input
+              type="number"
+              placeholder="Enter amount"
+              value={withdrawAmount}
+              onChange={(e) => setWithdrawAmount(e.target.value)}
+              className="border border-gray-300 p-2 rounded mb-4 w-full"
+            />
+            <div className="flex justify-end">
+              <button 
+                onClick={handleWithdrawClick} 
+                className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Withdraw
+              </button>
+              <button 
+                onClick={handleCloseModal} 
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-      </Transition>
+      )}
+      {isDepositModalOpen && (
+        <div ref={modalRef} className="modal fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-xl font-semibold mb-4">Deposit Funds</h2>
+            <input
+              type="number"
+              placeholder="Enter amount"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              className="border border-gray-300 p-2 rounded mb-4 w-full"
+            />
+            <div className="flex justify-end">
+              <button 
+                onClick={handleDepositClick} 
+                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+              >
+                Deposit
+              </button>
+              <button 
+                onClick={handleCloseModal} 
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
 
 export default Navbar;
+
