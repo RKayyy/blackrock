@@ -4,6 +4,8 @@ from flask_pymongo import PyMongo
 from bson import ObjectId
 import yfinance as yf
 from datetime import datetime, timedelta
+import google.generativeai as gen_ai
+import json 
 
 app = Flask(__name__)
 
@@ -12,6 +14,14 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for debuggin
 
 app.config["MONGO_URI"] = "mongodb+srv://admin_test:admin@cluster0.zybueoo.mongodb.net/blackrock?retryWrites=true&w=majority&appName=Cluster0"
 mongo = PyMongo(app)
+
+
+
+
+gen_ai.configure(api_key="AIzaSyBSWnwcXnytfGFi6ukWp0XRy_2SKBDtpKQ")
+model = gen_ai.GenerativeModel('gemini-pro')
+
+chat_session = model.start_chat(history=[])
 
 intervals_dict = {
     '1d': 1,
@@ -98,6 +108,9 @@ def get_stock_data(symbol):
         if data.empty:
             return jsonify({'error': 'Invalid stock symbol or no data available'}), 400
 
+        # Get the current price (latest closing price)
+        current_price = data['Close'].iloc[-1] if not data.empty else None
+
         # Split data into chunks
         data_points = []
         total_points = len(data)
@@ -122,10 +135,14 @@ def get_stock_data(symbol):
         return jsonify({
             'symbol': symbol,
             'interval': interval,
-            'data_chunks': data_points
+            'data_chunks': data_points,
+            'current_price': current_price  # Add current price to the response
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+    
 
 stocks = {
     'AAPL': {'ESG_value': 75, 'type': 'Technology'},
@@ -219,6 +236,62 @@ def sell_stock():
     )
 
     return jsonify({'message': 'Stock sold successfully'}), 200
+
+def get_response(symbol, current_price, historical_data, user_query):
+    # Validate inputs
+    if not symbol or current_price is None or not historical_data or not user_query:
+        return "Invalid input data"
+
+    # Prepare data for LLM
+    historical_data_str = json.dumps(historical_data)
+    prompt = f"""
+    You are a financial advisor
+    Given the historical stock data for {symbol}:
+    {historical_data_str}
+    
+    Current price: {current_price}
+    
+    User query: {user_query}
+    """
+
+    # Example API request to the LLM
+    # Replace with your actual LLM endpoint and API key
+    response = chat_session.send_message(prompt)
+    
+    # Handle the response
+    if response:
+        return response.text.strip()
+    else:
+        return "Failed to get response from the model"
+
+    
+
+
+@app.route('/query/<symbol>', methods=['POST'])
+def handle_query(symbol):
+    data = request.json
+    print(data)
+    current_price = data.get('current_price')
+    historical_data = data.get('historical_data')  # Expect a list of dictionaries
+    user_query = data.get('query')
+
+    response = get_response(symbol, current_price, historical_data, user_query)
+    return jsonify({'response': response})
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_message = request.json.get('message')
+    
+    if not user_message:
+        return jsonify({'error': 'No message provided'}), 400
+    
+    # Send user's message to Gemini-Pro and get the response
+    gemini_response = chat_session.send_message(user_message)
+    
+    # Return Gemini-Pro's response
+    return jsonify({'response': gemini_response.text})
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

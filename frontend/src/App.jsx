@@ -22,6 +22,7 @@ import Signup from "./pages/Signup";
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import CompanyStockPage from "./pages/CompanyStockPage";
+import ChatComponent from "./pages/components/ChatComponent";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/chatbot" element={<ChatComponent />} />
         <Route path="/companystockspage/:symbol" element={<CompanyStockPage />} />
       </Routes>
     </Router>
