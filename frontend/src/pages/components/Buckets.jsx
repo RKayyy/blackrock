@@ -69,7 +69,7 @@ const Buckets = () => {
             value={amount}
             onChange={handleChange}
             placeholder="Enter amount to invest"
-            className="w-full md:w-2/3 px-4 py-2 mb-4 md:mb-0 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 tex"
+            className="text-gray-800 w-full md:w-2/3 px-4 py-2 mb-4 md:mb-0 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 tex"
           />
           <button
             onClick={calculateInvestments}
