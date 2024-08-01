@@ -49,6 +49,7 @@ const ChatbotComponent = () => {
 
   return (
     <div className="p-8 bg-gradient-to-r from-blue-50 to-gray-100 rounded-lg shadow-2xl border border-gray-300 max-w-4xl mx-auto mt-10">
+     
       <h2 className="text-3xl font-bold text-gray-900 mb-6">Stock Chatbot</h2>
       <div className="mb-6">
         <textarea
@@ -56,17 +57,19 @@ const ChatbotComponent = () => {
           onChange={(e) => setUserQuery(e.target.value)}
           placeholder="Ask me anything about the stock..."
           rows="5"
-          className="w-full p-4 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-transform transform hover:scale-105"
+          className="w-full p-4 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-transform transform hover:scale-105 text-black" 
         />
       </div>
       <button
         onClick={handleQuery}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+        className="w-full bg-blue-600 text-black py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
       >
         Submit Query
       </button>
       <div className="mt-6">
+
         <h3 className="text-2xl font-semibold text-gray-800 mb-3">Chatbot Response:</h3>
+        
         <div className="relative p-6 bg-white border border-gray-200 rounded-lg shadow-lg">
           <p className="text-gray-700">{chatResponse || 'Awaiting your query...'}</p>
           {chatResponse && (

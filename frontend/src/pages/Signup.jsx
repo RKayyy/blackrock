@@ -13,13 +13,17 @@ function Signup() {
   }, [isSignedIn, navigate]);
 
   return (
-    <div>
-      <header>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <header className="text-center">
         <SignedOut>
-          <SignInButton />
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm mx-auto">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to [Your App Name]</h1>
+            <p className="text-gray-600 mb-6">Sign up to get started</p>
+            <SignInButton className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200" />
+          </div>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200" />
         </SignedIn>
       </header>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PieChart from "./components/PyChart";
 import Navbar from "./components/Navbar";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'; // Using Recharts instead
+// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'; // Using Recharts instead
 import axios from 'axios';
 import ESGBarChart from "./components/ESGcharts";
 import SectorDonutChart from "./components/Donut";
@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import Buckets from "./components/Buckets";
 import Typing from 'react-typing-effect';
 import './Dashboard.css';
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
 
 const Dashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
@@ -129,7 +130,7 @@ const Dashboard = () => {
   return (
     <>
 
-      <Navbar />
+      <Navbar accountBalance ={money} />
       <div className="p-4 flex flex-col items-center bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white min-h-screen ">
         {error && <div className="error-message text-red-500 mb-4">{error}</div>}
         <div className="mt-10"></div>
@@ -165,20 +166,25 @@ const Dashboard = () => {
             </div>
 
 
-            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
-              {/* <h2 className="text-lg font-bold mb-2 text-center">Line Chart</h2> */}
-              <LineChart
-                xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-                series={[
-                  {
-                    data: [2, 5.5, 2, 8.5, 1.5, 5],
-                  },
-                ]}
-                height={300} // Reduced height
-                margin={{ left: 10, right: 10, top: 10, bottom: 10 }} // Reduced margins
-                grid={{ vertical: true, horizontal: true }}
-              />
-            </div>
+            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64 w-full overflow-hidden">
+  <LineChart className="transform-scale-50"
+    width={400} // Reduced width
+    height={300} // Reduced height
+    data={formattedExpenseData}
+    margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
+  >
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="day" />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+    <Line type="monotone" dataKey="balance" stroke="#8884d8" />
+  </LineChart>
+</div>
+
+
+
+
 
             {/* Second Row: ESG Bar Chart and Sector Donut Chart */}
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">

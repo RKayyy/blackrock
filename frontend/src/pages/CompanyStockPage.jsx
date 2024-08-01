@@ -82,8 +82,8 @@ const CompanyStockPage = () => {
 
         <div className="flex flex-col items-center mb-6">
           <div className="flex gap-4 mb-4">
-            <button onClick={() => setAction('buy')} className={`px-4 py-2 rounded-lg shadow transition ${action === 'buy' ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}>Buy</button>
-            <button onClick={() => setAction('sell')} className={`px-4 py-2 rounded-lg shadow transition ${action === 'sell' ? 'bg-red-500 text-white' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}>Sell</button>
+            <button onClick={() => setAction('buy')} className={`px-4 py-2 rounded-lg shadow transition ${action === 'buy' ? 'bg-green-500 text-black' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}>Buy</button>
+            <button onClick={() => setAction('sell')} className={`px-4 py-2 rounded-lg shadow transition ${action === 'sell' ? 'bg-red-500 text-black' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}>Sell</button>
           </div>
           <input
             type="number"
@@ -91,7 +91,7 @@ const CompanyStockPage = () => {
             onChange={(e) => setUnits(e.target.value)}
             placeholder="Number of units"
             min="1"
-            className="px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="px-4 py-2 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-gray-800"
           />
           <button onClick={handleStockAction} className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 transition">
             {action === 'buy' ? 'Buy Stocks' : 'Sell Stocks'}

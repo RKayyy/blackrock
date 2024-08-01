@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,7 +11,6 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      // Check if user already exists
       const checkResponse = await axios.post('http://127.0.0.1:5000/check_user', {
         name,
         email,
@@ -20,12 +18,10 @@ function LoginPage() {
       });
 
       if (checkResponse.data.exists) {
-        // User exists, proceed to login
         alert(checkResponse.data.message);
-        localStorage.setItem('user_id', checkResponse.data.user_id); // Store user ID
-        navigate('/home');  // Navigate to /home upon successful login
+        localStorage.setItem('user_id', checkResponse.data.user_id);
+        navigate('/home');
       } else {
-        // User does not exist, add user
         const addResponse = await axios.post('http://127.0.0.1:5000/add', {
           name,
           email,
@@ -33,8 +29,8 @@ function LoginPage() {
         });
 
         alert(addResponse.data.message);
-        localStorage.setItem('user_id', addResponse.data.user_id); // Store new user ID
-        navigate('/home');  // Navigate to /home upon successful login
+        localStorage.setItem('user_id', addResponse.data.user_id);
+        navigate('/home');
       }
     } catch (error) {
       console.error('There was an error!', error);
@@ -43,44 +39,54 @@ function LoginPage() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="role">Role:</label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            required
+    <div className="bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-gray-400 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">LOGIN</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name:</label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-200"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-200"
+            />
+          </div>
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">Role:</label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-200"
+            >
+              <option value="">Select a role</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 mt-20"
           >
-            <option value="">Select a role</option>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <button type="submit">Submit</button>
-      </form>
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
