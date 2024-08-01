@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import PieChart from "./components/PyChart";
 import Navbar from "./components/Navbar";
-// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'; // Using Recharts instead
-import axios from 'axios';
 import ESGBarChart from "./components/ESGcharts";
 import SectorDonutChart from "./components/Donut";
-import '../styles/Dashboard.css';
-import PropTypes from 'prop-types';
 import Buckets from "./components/Buckets";
 import Typing from 'react-typing-effect';
-import './Dashboard.css';
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line } from 'recharts';
+import '../styles/Dashboard.css';
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
@@ -19,12 +17,8 @@ const Dashboard = () => {
   const [userRole, setUserRole] = useState('');
   const [expenseData, setExpenseData] = useState([]);
   const [error, setError] = useState(null);
-  const userId = "66a91c9d62a6be8083bed17e";
   const [money, setMoney] = useState(0);
-
-  const handleTypingComplete = () => {
-    setCurrentMottoIndex((prevIndex) => (prevIndex + 1) % mottoVariations.length);
-  };
+  const userId = "66a91c9d62a6be8083bed17e";
 
   const mottoVariations = [
     "We prioritize our clients' financial success.",
@@ -40,7 +34,10 @@ const Dashboard = () => {
     Math.floor(Math.random() * mottoVariations.length)
   );
 
-  // Update the motto index periodically
+  const handleTypingComplete = () => {
+    setCurrentMottoIndex((prevIndex) => (prevIndex + 1) % mottoVariations.length);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -115,13 +112,12 @@ const Dashboard = () => {
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  // Convert expenses data to use day number
   const formatExpenseData = (data) => {
     const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     return sortedData.map((item, index) => ({
-      day: index + 1, // Day number
-      balance: item.balance // Use the correct field for the value
+      day: index + 1,
+      balance: item.balance
     }));
   };
 
@@ -129,78 +125,66 @@ const Dashboard = () => {
 
   return (
     <>
-
-      <Navbar accountBalance ={money} />
+      <Navbar accountBalance={money} />
       <div className="p-4 flex flex-col items-center bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 text-white min-h-screen ">
         {error && <div className="error-message text-red-500 mb-4">{error}</div>}
         <div className="mt-10"></div>
         <div className="flex flex-col lg:flex-row w-full mb-8 mt-20">
-          {/* Left Section with Motto */}
           <div className="lg:w-2/4 bg-gray-0 p-5 rounded-lg shadow-lg mb-6 lg:mb-0 ">
             <h1 className="text-5xl font-bold mb-4 text-center text-gray-0 mt-20">
               <Typing
                 text={mottoVariations[currentMottoIndex]}
                 cursor=" "
-                speed={100} // Typing speed
-                eraseSpeed={50} // Erase speed
-                eraseDelay={1000} // Delay before erasing
-                typingDelay={500} // Delay before typing starts
-                className="text-6xl font-extrabold text-gray-300" // Larger font for typing effect with light gray color
-                onFinishedTyping={handleTypingComplete} // Callback when typing completes
+                speed={100}
+                eraseSpeed={50}
+                eraseDelay={1000}
+                typingDelay={500}
+                className="text-6xl font-extrabold text-gray-300"
+                onFinishedTyping={handleTypingComplete}
               />
             </h1>
           </div>
 
-
-          {/* Right Section with Charts arranged in 2x2 grid */}
           <div className="lg:w-3/4 lg:ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* First Row: Pie Chart and Line Chart */}
             <div className="bg-gray-700 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
               <h2 className="text-lg font-bold z-1 text-center">Stock Data</h2>
               <PieChart
                 data={pieChartData}
-                outerRadius={70} // Smaller size for the pie chart
+                outerRadius={70}
                 colors={['#ff6361', '#bc5090', '#ffa600']}
-              // className="mt-1"
               />
             </div>
 
-
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64 w-full overflow-hidden">
-  <LineChart className="transform-scale-50"
-    width={400} // Reduced width
-    height={300} // Reduced height
-    data={formattedExpenseData}
-    margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="day" />
-    <YAxis />
-    <Tooltip />
-    <Legend />
-    <Line type="monotone" dataKey="balance" stroke="#8884d8" />
-  </LineChart>
-</div>
-
-
-
-
-
-            {/* Second Row: ESG Bar Chart and Sector Donut Chart */}
-            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
-              <h2 className="text-lg font-bold mb-2 text-center">ESG Values</h2>
-              <ESGBarChart data={esgData} height={50} width={100} /> {/* Reduced height and set width */}
-
+              <ResponsiveContainer>
+                <LineChart
+                  width={400}
+                  height={300}
+                  data={formattedExpenseData}
+                  margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="balance" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
 
             <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
-              {/* <h2 className="text-lg font-bold text-center mt-10 ">Sector Distribution</h2> */}
+              <h2 className="text-lg font-bold mb-2 text-center">ESG Values</h2>
+              <ESGBarChart data={esgData} height={50} width={100} />
+            </div>
+
+            <div className="bg-gray-700 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center h-64">
               <div className="mt-10"></div>
-              <SectorDonutChart data={sectorData} /> {/* Smaller size */}
+              <SectorDonutChart data={sectorData} />
             </div>
           </div>
         </div>
-        {/* Buckets Section */}
+        
         {userRole === "admin" && (
           <div className="mt-6 w-full bg-gray-700 p-6 rounded-lg shadow-lg">
             <h2 className="text-3xl font-bold mb-4 text-center text-white">BUCKETS</h2>
